@@ -5,8 +5,15 @@ A utility script for translating content using Google's Gemini AI model while pr
 ## Setup
 
 1. Install the required dependencies:
+
+   Using pip:
    ```
-   pip install -r requirements.txt
+   pip install google-genai>=1.5.0
+   ```
+   
+   Or using `uv` (recommended if you have it installed):
+   ```
+   uv pip install .
    ```
 
 2. Set your Google API key as an environment variable:
