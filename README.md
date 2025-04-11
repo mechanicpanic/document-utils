@@ -1,6 +1,14 @@
-# Translate Script
+# Unified Translation Scripts
 
-A utility script for translating content using Google's Gemini AI model while preserving special content (such as LaTeX mathematical expressions).
+A suite of utilities for translating content using Google's Gemini AI model while preserving special content like LaTeX mathematical expressions, markdown formatting, and document structure.
+
+## Features
+
+- Supports multiple input formats: PDF, LaTeX, Markdown, and plain text
+- Preserves mathematical formulas and special formatting
+- Handles large documents through smart batching
+- Outputs to multiple formats: TXT, Markdown, JSON, and CSV
+- Intelligent line break handling for readable output
 
 ## Setup
 
@@ -8,7 +16,7 @@ A utility script for translating content using Google's Gemini AI model while pr
 
    Using pip:
    ```
-   pip install google-genai>=1.5.0
+   pip install google-genai>=1.5.0 PyPDF2>=3.0.0 markdown>=3.4.0
    ```
    
    Or using `uv` (recommended if you have it installed):
@@ -21,12 +29,44 @@ A utility script for translating content using Google's Gemini AI model while pr
    export GOOGLE_API_KEY="your-api-key-here"
    ```
 
-## Usage
+## Universal Translator
+
+The main script that handles all document types (PDF, LaTeX, Markdown, and plain text):
 
 ```
-usage: translate_gemini.py [-h] [-l LANGUAGE] [-o OUTPUT_SUFFIX] [-p PROMPT] [-m MODEL] [-v] input_file
+usage: translate.py [-h] [-l LANGUAGE] [-o OUTPUT] [-f FORMATS] [--fix-linebreaks] [-p PROMPT] [-m MODEL] [-b BATCH_SIZE] [-v] input_file
 
-Translate content from files while preserving special content
+Translate various file formats (PDF, LaTeX, Markdown, Text) while preserving formatting
+
+positional arguments:
+  input_file            Path to the input file to translate
+
+options:
+  -h, --help            show this help message and exit
+  -l LANGUAGE, --language LANGUAGE
+                        Target language for translation (default: French)
+  -o OUTPUT, --output OUTPUT
+                        Base name for output files (default: same as input with _translated suffix)
+  -f FORMATS, --formats FORMATS
+                        Comma-separated list of output formats: txt,md,json,csv (default: txt,md,json)
+  --fix-linebreaks      Fix line breaks in translated output (default: True)
+  -p PROMPT, --prompt PROMPT
+                        Custom prompt to use for translation instead of the default
+  -m MODEL, --model MODEL
+                        Gemini model to use for translation (default: gemini-2.0-flash)
+  -b BATCH_SIZE, --batch-size BATCH_SIZE
+                        Maximum tokens per batch (default: 500000)
+  -v, --verbose         Enable verbose logging
+```
+
+## Legacy LaTeX Translator
+
+A previously used script specifically for LaTeX translation (kept for backward compatibility):
+
+```
+usage: tex_translate.py [-h] [-l LANGUAGE] [-o OUTPUT_SUFFIX] [-p PROMPT] [-m MODEL] [-v] input_file
+
+Translate content from LaTeX files while preserving special content
 
 positional arguments:
   input_file            Path to the input file to translate
@@ -48,27 +88,31 @@ options:
 
 Translate a LaTeX file to French (default):
 ```
-python translate_gemini.py document.tex
+./translate.py document.tex
 ```
 
-Translate a LaTeX file to Spanish with custom output suffix:
+Translate a PDF to Spanish and output all format types:
 ```
-python translate_gemini.py document.tex --language Spanish --output-suffix ES
-```
-
-Use a custom prompt for translation:
-```
-python translate_gemini.py document.tex --prompt "Translate this to French, focusing on formal academic language"
+./translate.py document.pdf -l Spanish -f txt,md,json,csv
 ```
 
-Use a different Gemini model:
+Translate a Markdown file using a more powerful model:
 ```
-python translate_gemini.py document.tex --model gemini-2.0-pro
+./translate.py document.md -m gemini-2.0-pro
 ```
 
-## Notes
+Translate a large document with custom batch size:
+```
+./translate.py large_document.txt -b 300000
+```
 
-- The script preserves special content like LaTeX mathematical expressions by instructing the model to translate only text portions.
-- The default prompt is designed for LaTeX files but can be customized for other formats.
-- Output files are saved in the same directory as the input file with the specified suffix.
-- The script automatically removes markdown code block markers (``` and ```) from the beginning and end of the translation response, which Gemini sometimes adds.
+## File Type Detection
+
+The unified script automatically detects the file type based on extension:
+- `.pdf` → PDF processing
+- `.tex` → LaTeX processing
+- `.md`, `.markdown` → Markdown processing
+- `.txt`, `.text` → Plain text processing
+- Any other extension is treated as plain text
+
+Each file type uses a specialized prompt template to preserve its formatting.

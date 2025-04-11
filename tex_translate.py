@@ -42,19 +42,19 @@ def translate_content(
     """
     Translate content from a file to the specified target language,
     preserving special content (like LaTeX math).
-    
+
     Args:
         input_file_path: Path to the input file to translate
         target_language: Target language for translation
         output_suffix: Suffix to add to the output filename
         custom_prompt: Custom prompt to use for translation
         model: Gemini model to use for translation
-    
+
     Returns:
         The path to the translated output file
     """
     input_path = Path(input_file_path)
-    
+
     # Read the input file
     logger.info(f"Reading input file: {input_path}")
     try:
@@ -93,25 +93,27 @@ def translate_content(
 
     # Process the response text - remove markdown code blocks if present
     translated_text = response.text
-    
+
     # Check if the text begins with "```" or "```latex" and ends with "```"
     # This is common in Gemini responses when translating code or LaTeX
     lines = translated_text.splitlines()
     if len(lines) >= 2:
         first_line = lines[0].strip()
         last_line = lines[-1].strip()
-        
+
         # Check if the response is wrapped in code blocks
-        if (first_line.startswith("```") and last_line == "```"):
+        if first_line.startswith("```") and last_line == "```":
             logger.debug("Detected code block in response, removing wrapper lines")
             # Remove the first and last lines
             translated_text = "\n".join(lines[1:-1])
-            logger.debug(f"Removed first line: '{first_line}' and last line: '{last_line}'")
+            logger.debug(
+                f"Removed first line: '{first_line}' and last line: '{last_line}'"
+            )
 
     # Generate output filename
     output_file_path = f"{input_path.stem}_{output_suffix}{input_path.suffix}"
     output_path = input_path.parent / output_file_path
-    
+
     # Save translated content
     logger.info(f"Saving translation to: {output_path}")
     try:
@@ -130,46 +132,46 @@ def main():
     parser = argparse.ArgumentParser(
         description="Translate content from files while preserving special content"
     )
+    parser.add_argument("input_file", help="Path to the input file to translate")
     parser.add_argument(
-        "input_file", help="Path to the input file to translate"
+        "-l",
+        "--language",
+        default="French",
+        help="Target language for translation (default: French)",
     )
     parser.add_argument(
-        "-l", "--language", 
-        default="French", 
-        help="Target language for translation (default: French)"
+        "-o",
+        "--output-suffix",
+        default="translated",
+        help="Suffix to add to the output filename (default: 'translated')",
     )
     parser.add_argument(
-        "-o", "--output-suffix", 
-        default="translated", 
-        help="Suffix to add to the output filename (default: 'translated')"
+        "-p",
+        "--prompt",
+        help="Custom prompt to use for translation instead of the default",
     )
     parser.add_argument(
-        "-p", "--prompt",
-        help="Custom prompt to use for translation instead of the default"
-    )
-    parser.add_argument(
-        "-m", "--model",
+        "-m",
+        "--model",
         default="gemini-2.0-flash",
-        help="Gemini model to use for translation (default: gemini-2.0-flash)"
+        help="Gemini model to use for translation (default: gemini-2.0-flash)",
     )
     parser.add_argument(
-        "-v", "--verbose", 
-        action="store_true", 
-        help="Enable verbose logging"
+        "-v", "--verbose", action="store_true", help="Enable verbose logging"
     )
-    
+
     args = parser.parse_args()
-    
+
     # Set logging level based on verbosity
     if args.verbose:
         logger.setLevel(logging.DEBUG)
         logger.debug("Verbose logging enabled")
-    
+
     # Check if input file exists
     if not os.path.exists(args.input_file):
         logger.error(f"Input file not found: {args.input_file}")
         sys.exit(1)
-    
+
     # Run translation process
     translate_content(
         input_file_path=args.input_file,
