@@ -1,14 +1,18 @@
-# Unified Translation Scripts
+# Document Utils
 
-A suite of utilities for translating content using Google's Gemini AI model while preserving special content like LaTeX mathematical expressions, markdown formatting, and document structure.
+A collection of utilities for working with documents including translation tools that use Google's Gemini AI model while preserving special content like LaTeX mathematical expressions, markdown formatting, and document structure.
 
 ## Features
 
+### Translation Tools
 - Supports multiple input formats: PDF, LaTeX, Markdown, and plain text
 - Preserves mathematical formulas and special formatting
 - Handles large documents through smart batching
 - Outputs to multiple formats: TXT, Markdown, JSON, and CSV
 - Intelligent line break handling for readable output
+
+### Grammar Checking
+- LaTeX grammar checker for improving document quality
 
 ## Setup
 
@@ -16,7 +20,7 @@ A suite of utilities for translating content using Google's Gemini AI model whil
 
    Using pip:
    ```
-   pip install google-genai>=1.5.0 PyPDF2>=3.0.0 markdown>=3.4.0
+   pip install google-genai>=1.5.0 PyPDF2>=3.0.0 markdown>=3.4.0 PyMuPDF>=1.23.0 rich>=13.0.0
    ```
    
    Or using `uv` (recommended if you have it installed):
@@ -29,7 +33,7 @@ A suite of utilities for translating content using Google's Gemini AI model whil
    export GOOGLE_API_KEY="your-api-key-here"
    ```
 
-## Universal Translator
+## Translation Tools
 
 The main script that handles all document types (PDF, LaTeX, Markdown, and plain text):
 
@@ -86,6 +90,8 @@ options:
 
 ## Examples
 
+### Translation Examples
+
 Translate a LaTeX file to French (default):
 ```
 ./translate.py document.tex
@@ -106,6 +112,18 @@ Translate a large document with custom batch size:
 ./translate.py large_document.txt -b 300000
 ```
 
+### Grammar Checking Examples
+
+Check grammar in a PDF document:
+```
+./check_grammar.py document.pdf
+```
+
+Save grammar check results to a file:
+```
+./check_grammar.py document.pdf --output grammar_results.json
+```
+
 ## File Type Detection
 
 The unified script automatically detects the file type based on extension:
@@ -116,3 +134,28 @@ The unified script automatically detects the file type based on extension:
 - Any other extension is treated as plain text
 
 Each file type uses a specialized prompt template to preserve its formatting.
+
+## Grammar Checking Tool
+
+The LaTeX PDF grammar checker extracts text from PDFs and identifies grammar issues:
+
+```
+usage: check_grammar.py [-h] [--api-key API_KEY] [--output OUTPUT] pdf_path
+
+LaTeX PDF Grammar Checker
+
+positional arguments:
+  pdf_path       Path to the LaTeX PDF file
+
+options:
+  -h, --help     show this help message and exit
+  --api-key      Google API key for Gemini (or use GOOGLE_API_KEY environment variable)
+  --output       Save results to file instead of terminal display
+```
+
+Features:
+- PDF text extraction with formatting preservation
+- Grammar error detection using Gemini AI
+- Rich colored terminal output with highlighted differences
+- Line-by-line error analysis with suggestions
+- Optional JSON output for further processing
