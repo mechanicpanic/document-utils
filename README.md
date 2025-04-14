@@ -135,6 +135,38 @@ The unified script automatically detects the file type based on extension:
 
 Each file type uses a specialized prompt template to preserve its formatting.
 
+## PDF Slide Translator
+
+A tool for translating PowerPoint presentations converted from PDF files:
+
+```
+usage: translate_document_replacement.py [-h] [--output_file OUTPUT_FILE] [--api_key API_KEY] [--skip_conversion]
+                                         [--wait_time WAIT_TIME] [--retry_count RETRY_COUNT] [--batch_size BATCH_SIZE] [--save_progress]
+                                         input_file target_language
+
+Convert PDF to PPTX and translate using Google Gemini
+
+positional arguments:
+  input_file            Path to the input file (PDF or PPTX)
+  target_language       Target language for translation
+
+options:
+  -h, --help            show this help message and exit
+  --output_file         Path to save the translated file
+  --api_key             Google API key
+  --skip_conversion     Skip PDF to PPTX conversion (if input is already PPTX)
+  --wait_time           Wait time between API calls in seconds (default: 1.0)
+  --retry_count         Number of retries on API failure (default: 3)
+  --batch_size          Number of text blocks to process in each batch (default: 1)
+  --save_progress       Save translation progress to resume later if interrupted
+```
+
+Features:
+- Converts PDF slides to PowerPoint format
+- Translates slide text while preserving formatting
+- Supports resuming interrupted translations
+- Handles rate limiting with exponential backoff
+
 ## Grammar Checking Tool
 
 The LaTeX PDF grammar checker extracts text from PDFs and identifies grammar issues:
